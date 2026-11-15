@@ -6,6 +6,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY src ./src
+COPY assets ./assets
 COPY tests ./tests
 
 # ---------- test: run the suite; the build fails if a test fails ----------
@@ -20,6 +21,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 COPY --from=build /app/src ./src
+COPY --from=build /app/assets ./assets
 USER node
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s \

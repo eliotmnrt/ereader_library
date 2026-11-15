@@ -377,7 +377,7 @@ The DevOps loop arrives early (bricks 3 to 5) and grows afterwards.
 | D13 | Public GitHub repo `ereader_library` | Private repo (limited CI minutes, no free arm64 runners) |
 | D14 | Backups on Backblaze B2 | Oracle Object Storage (same provider as production) |
 | D15 | Garage for object storage | MinIO: the community edition no longer ships Docker images (checked 2026-11-12) |
-| D16 | Built by hand, brick by brick (Claude guides and reviews, does not write the code) | Generated walking skeleton (tried on 2026-11-12, then deleted) |
+| D16 | Built brick by brick with explenations and detailling challenges faced
 
 ## 13. Open questions
 

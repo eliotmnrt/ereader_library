@@ -1,0 +1,13 @@
+<%- include('../partials/head', { title: 'Enter code' }) %>
+  <h1>Ereader Library</h1>
+  <% if (error) { %>
+    <p class="error"><%= error %></p>
+  <% } %>
+  <form method="POST" action="/r">
+    <label for="ebookCode">Ebook code:</label>
+    <input id="ebookCode" name="ebookCode" type="text" maxlength="7"
+           autocomplete="off" autocapitalize="characters" required>
+    <br>
+    <button type="submit">Submit</button>
+  </form>
+<%- include('../partials/foot') %>

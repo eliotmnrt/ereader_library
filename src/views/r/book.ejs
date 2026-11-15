@@ -1,0 +1,6 @@
+<%- include('../partials/head', { title: book.title }) %>
+  <h1><%= book.title %></h1>
+  <p class="meta"><%= book.author %> · <%= book.format %> · <%= size %></p>
+  <p><a class="button" href="/r/<%= code %>/download">Download</a></p>
+  <p><a href="/r">Enter another code</a></p>
+<%- include('../partials/foot') %>
