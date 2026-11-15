@@ -57,28 +57,53 @@ jobs:
         context: .
         target: test
         push: false
+        # Shares layers with the push job below, so `npm ci` is not redone from scratch
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
 
-  push-to-docker-hub:
+  push-to-ghcr:
     runs-on: ubuntu-latest
     needs: [test-and-build]
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    # GITHUB_TOKEN is allowed to push packages to this repo's GHCR namespace
+    permissions:
+      contents: read
+      packages: write
     steps:
     - uses: actions/checkout@v4
-    
+
+    # QEMU emulates arm64 on the amd64 runner, so one build can produce both architectures
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
-    - name: Login to Docker Hub
+
+    - name: Login to GHCR
       uses: docker/login-action@v3
       with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_TOKEN }}
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build production image
+    # Computes the tags (full commit SHA + latest) and OCI labels (links the package to the repo)
+    - name: Image metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ghcr.io/${{ github.repository }}
+        tags: |
+          type=sha,format=long,prefix=
+          type=raw,value=latest
+
+    - name: Build and push multi-arch production image
       uses: docker/build-push-action@v5
       with:
         context: .
         target: prod
+        platforms: linux/amd64,linux/arm64
         push: true
-        tags: |-
-          ${{ secrets.DOCKER_USERNAME }}/ereader_library:latest
-          ${{ secrets.DOCKER_USERNAME }}/ereader_library:${{ github.sha }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
